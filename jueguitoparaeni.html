@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atrapa mi amor ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #ffb3d9 0%, #ff80bf 100%);
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            text-align: center;
+            color: white;
+            touch-action: manipulation;
+        }
+
+        #ui {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .score { font-size: 2rem; text-shadow: 2px 2px 10px rgba(0,0,0,0.2); }
+
+        .heart {
+            position: absolute;
+            font-size: 3rem;
+            cursor: pointer;
+            user-select: none;
+            transition: transform 0.1s;
+        }
+
+        #win-screen {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #ff007f;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="ui">
+        <div class="score">Puntos: <span id="score">0</span> / 15</div>
+        <p>¡Atrapa 15 corazones!</p>
+    </div>
+
+    <div id="win-screen">
+        <h1>¡Eres la mejor jugadora! 🏆</h1>
+        <p>Me tienes ganadísimo el corazón.</p>
+        <button onclick="location.reload()">Jugar otra vez</button>
+    </div>
+
+    <script>
+        let score = 0;
+        const scoreEl = document.getElementById('score');
+        const winScreen = document.getElementById('win-screen');
+
+        function createHeart() {
+            if (score >= 15) return;
+
+            const heart = document.createElement('div');
+            heart.className = 'heart';
+            heart.innerText = '❤️';
+            
+            // Posición aleatoria
+            const x = Math.random() * (window.innerWidth - 50);
+            heart.style.left = x + 'px';
+            heart.style.top = '-60px';
+
+            // Velocidad aleatoria
+            const duration = 2 + Math.random() * 3;
+            heart.style.transition = `top ${duration}s linear`;
+
+            document.body.appendChild(heart);
+
+            // Iniciar caída
+            setTimeout(() => {
+                heart.style.top = window.innerHeight + 'px';
+            }, 100);
+
+            // Click / Toque
+            heart.onclick = () => {
+                score++;
+                scoreEl.innerText = score;
+                heart.innerText = '✨';
+                heart.style.pointerEvents = 'none';
+                setTimeout(() => heart.remove(), 200);
+
+                if (score === 15) {
+                    setTimeout(() => winScreen.style.display = 'flex', 500);
+                }
+            };
+
+            // Limpiar si sale de pantalla
+            setTimeout(() => {
+                if (heart.parentElement) heart.remove();
+            }, duration * 1000);
+        }
+
+        // Crear corazones cada segundo
+        setInterval(createHeart, 800);
+    </script>
+</body>
+</html>
