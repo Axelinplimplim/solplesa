@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para mi niña hermosa ❤️</title>
+    <style>
+        body {
+            margin: 0;
+            background: radial-gradient(circle, #ffb3d9 0%, #ff80bf 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            color: #fff;
+            text-align: center;
+        }
+
+        #welcome-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            background-color: #ff007f;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+        }
+
+        #game-area {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .gift-box {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            background-color: #ff007f;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: 
+                linear-gradient(90deg, transparent 45%, #fff 45%, #fff 55%, transparent 55%),
+                linear-gradient(0deg, transparent 45%, #fff 45%, #fff 55%, transparent 55%);
+        }
+
+        .gift-box::after { content: '💝'; position: absolute; top: -20px; font-size: 2rem; }
+
+        .box-message {
+            font-size: 1.1rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 0.4s ease;
+        }
+
+        .gift-box.opened { background: none; }
+        .gift-box.opened .box-message { opacity: 1; transform: scale(1); }
+
+        /* --- PANTALLA FINAL RE-ESTRUCTURADA --- */
+        #final-screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between; /* Esto empuja las cosas a los extremos */
+            align-items: center;
+            padding: 60px 20px; /* Espacio arriba y abajo */
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 50;
+        }
+
+        .final-title {
+            font-size: 2.5rem;
+            color: #ffb3d9;
+            text-shadow: 0 0 15px #ff007f;
+            margin: 0;
+        }
+
+        #final-heart-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            transform-style: preserve-3d;
+            flex-grow: 1; /* Esto hace que el corazón tome el espacio central */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .final-footer-text {
+            font-size: 1.3rem;
+            max-width: 80%;
+            margin: 0;
+        }
+
+        .ui_love_word {
+            position: absolute;
+            color: #ffb3d9;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-shadow: 0 0 5px #ffb3d9;
+            animation: heart-anim 4s infinite alternate;
+        }
+
+        @keyframes heart-anim {
+            0% { opacity: 0; transform: translate3d(var(--x), var(--y), -30px); }
+            50% { opacity: 1; }
+            100% { opacity: 0.2; transform: translate3d(var(--x), var(--y), 30px); }
+        }
+
+        .particle { position: absolute; pointer-events: none; animation: explode 1s forwards; }
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%); opacity: 1; }
+            100% { transform: translate(var(--dx), var(--dy)); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="welcome-screen">
+        <h1>¡Hola, mi amor! ❤️</h1>
+        <button onclick="startGame()">¡Ver mis regalos!</button>
+    </div>
+
+    <div id="game-area"></div>
+
+    <div id="final-screen">
+        <div class="final-title">Recupérate, mi amor ❤️</div>
+        
+        <div id="final-heart-container"></div>
+
+        <p class="final-footer-text">
+            Eres lo más bonito que me ha pasado.<br>
+            Gracias por existir. Te amo muchísimo.
+        </p>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('game-area');
+        const finalScreen = document.getElementById('final-screen');
+        let boxesOpened = 0;
+
+        const messages = [
+            "Mienihermosa",
+            "Eres mi bebé",
+            "Te extraño mi amor:(",
+            "Te voa preñar 😈",
+            "Ya quiero verte 💕",
+            "Teamocorasondemelon💕"
+        ];
+
+        function startGame() {
+            document.getElementById('welcome-screen').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('welcome-screen').style.display = 'none';
+                gameArea.style.opacity = '1';
+                generateBoxes();
+            }, 500);
+        }
+
+        function generateBoxes() {
+            messages.forEach((msg, i) => {
+                const box = document.createElement('div');
+                box.className = 'gift-box';
+                box.innerHTML = `<div class="box-message">${msg}</div>`;
+                box.onclick = () => {
+                    if(!box.classList.contains('opened')) {
+                        box.classList.add('opened');
+                        createExplosion(box);
+                        boxesOpened++;
+                        if(boxesOpened === messages.length) setTimeout(showFinal, 1500);
+                    }
+                };
+                gameArea.appendChild(box);
+            });
+        }
+
+        function createExplosion(el) {
+            const rect = el.getBoundingClientRect();
+            for (let i = 0; i < 12; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                p.innerText = '❤️';
+                p.style.left = (rect.left + rect.width/2) + 'px';
+                p.style.top = (rect.top + rect.height/2) + 'px';
+                const a = Math.random() * Math.PI * 2;
+                const v = 60 + Math.random() * 80;
+                p.style.setProperty('--dx', Math.cos(a)*v + 'px');
+                p.style.setProperty('--dy', Math.sin(a)*v + 'px');
+                document.body.appendChild(p);
+                setTimeout(() => p.remove(), 1000);
+            }
+        }
+
+        function showFinal() {
+            gameArea.style.display = 'none';
+            finalScreen.style.display = 'flex';
+            generateHeart();
+        }
+
+        function generateHeart() {
+            const container = document.getElementById('final-heart-container');
+            for (let i = 0; i < 80; i++) {
+                const span = document.createElement('span');
+                span.className = 'ui_love_word';
+                span.innerText = "I love you";
+                let t = (i / 80) * 2 * Math.PI;
+                // Escala ajustada a 7 para que no sea excesivamente grande y quepa bien
+                let x = 16 * Math.pow(Math.sin(t), 3) * 7;
+                let y = -1 * (13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t)) * 7;
+                span.style.setProperty('--x', x + 'px');
+                span.style.setProperty('--y', y + 'px');
+                span.style.animationDelay = (Math.random()*4) + 's';
+                container.appendChild(span);
+            }
+        }
+    </script>
+</body>
+</html>
